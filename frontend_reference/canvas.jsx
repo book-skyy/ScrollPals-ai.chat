@@ -1,4 +1,4 @@
-// canvas.jsx — All 7 MIRAGE screens laid out side-by-side for review
+// canvas.jsx — All 7 ScrollPals screens laid out side-by-side for review
 
 function CanvasApp() {
   // Force dark theme for the canvas (preview screens all dark by default)

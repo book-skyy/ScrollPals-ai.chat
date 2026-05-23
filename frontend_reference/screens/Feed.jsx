@@ -215,7 +215,7 @@ function SeaCta({ visible, char, onTap, onClose }) {
   return (
     <FloatingCta visible={visible} char={char} onClose={onClose}
       title="主人，想跟我聊聊吗 🥺?"
-      subtitle="海里好玩的事我可有一肚子要讲～"
+      subtitle="好玩的事我可有一肚子要讲～"
       buttonLabel="去聊聊"
       onTap={onTap} />
   );
@@ -649,8 +649,8 @@ function CollectButton({ post }) {
   const [collected, setCollected] = React.useState(() => Collection.has(post.id));
   React.useEffect(() => {
     const refresh = () => setCollected(Collection.has(post.id));
-    window.addEventListener('mirage:collection-changed', refresh);
-    return () => window.removeEventListener('mirage:collection-changed', refresh);
+    window.addEventListener('scrollpals:collection-changed', refresh);
+    return () => window.removeEventListener('scrollpals:collection-changed', refresh);
   }, [post.id]);
   const onClick = (e) => {
     e.stopPropagation();
@@ -695,8 +695,8 @@ function PostcardBack({ post, char, onAvatar, guide, compact = false }) {
   const [collected, setCollected] = React.useState(() => Collection.has(post.id));
   React.useEffect(() => {
     const refresh = () => setCollected(Collection.has(post.id));
-    window.addEventListener('mirage:collection-changed', refresh);
-    return () => window.removeEventListener('mirage:collection-changed', refresh);
+    window.addEventListener('scrollpals:collection-changed', refresh);
+    return () => window.removeEventListener('scrollpals:collection-changed', refresh);
   }, [post.id]);
 
   const onCollect = (e) => {
@@ -837,7 +837,7 @@ function PostcardBack({ post, char, onAvatar, guide, compact = false }) {
           textAlign: 'right',
         }}>
           {post.id.toUpperCase()}<br/>
-          MIRAGE · 幻伴邮政
+          ScrollPals Post
         </div>
       </div>
     </div>

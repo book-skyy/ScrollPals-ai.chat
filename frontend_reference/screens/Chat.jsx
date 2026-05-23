@@ -5,7 +5,7 @@
 const CHAT_BG = '#ededed';
 const CHAT_INK = '#15131c';
 const BUBBLE_AI = '#ffffff';
-const BUBBLE_ME = '#a48bff';  // MIRAGE purple instead of WeChat green
+const BUBBLE_ME = '#a48bff';  // ScrollPals purple instead of WeChat green
 
 const SAMPLE_MESSAGES = [
   { from: 'me', text: '你今天去哪了？', time: '2025/05/22 21:58' },

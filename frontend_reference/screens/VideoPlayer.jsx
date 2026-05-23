@@ -194,7 +194,7 @@ function VideoPlayer({ onNav, postId = 'p1' }) {
             <span key={t} style={{ color: 'rgba(255,255,255,0.9)' }}> #{t}</span>
           ))}
           {' '}
-          <span style={{ color: 'rgba(255,255,255,0.85)' }}>#AIvlog #幻伴</span>
+          <span style={{ color: 'rgba(255,255,255,0.85)' }}>#AIvlog #ScrollPals</span>
         </p>
 
         {!expanded && (

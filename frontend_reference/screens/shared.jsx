@@ -1,4 +1,4 @@
-// shared.jsx — Phone shell, Icons, common atoms for MIRAGE 幻伴
+// shared.jsx — Phone shell, Icons, common atoms for ScrollPals
 
 // ─── ICONS ──────────────────────────────────────────────────
 const Icon = {
@@ -172,7 +172,7 @@ const Icon = {
 // ─── Postcard collection store ──────────────────────────────
 // Persists "collected" postcards (keyed by post id) to localStorage so the
 // Collection screen can browse cities the user has been to.
-const COLLECTION_KEY = 'mirage.collection.v1';
+const COLLECTION_KEY = 'scrollpals.collection.v1';
 
 const Collection = {
   read() {
@@ -184,7 +184,7 @@ const Collection = {
   },
   write(items) {
     try { window.localStorage.setItem(COLLECTION_KEY, JSON.stringify(items)); } catch {}
-    window.dispatchEvent(new CustomEvent('mirage:collection-changed'));
+    window.dispatchEvent(new CustomEvent('scrollpals:collection-changed'));
   },
   has(postId) {
     return this.read().some((x) => x.postId === postId);
@@ -224,10 +224,10 @@ function useCollection() {
   const [items, setItems] = React.useState(() => Collection.read());
   React.useEffect(() => {
     const refresh = () => setItems(Collection.read());
-    window.addEventListener('mirage:collection-changed', refresh);
+    window.addEventListener('scrollpals:collection-changed', refresh);
     window.addEventListener('storage', refresh);
     return () => {
-      window.removeEventListener('mirage:collection-changed', refresh);
+      window.removeEventListener('scrollpals:collection-changed', refresh);
       window.removeEventListener('storage', refresh);
     };
   }, []);
@@ -489,29 +489,29 @@ const CHARACTERS = [
   // dango = the cat — only appears in Chat as the user's companion, no Feed posts.
   { id: 'dango', name: '团子', nameEn: 'Dango',
     species: '银渐层小猫 · silver tabby kitten',
-    tag: '幻伴号：dango.cat', avatar: 'dango-cat', emoji: '🐱', isCat: true,
+    tag: 'ScrollPals ID：dango.cat', avatar: 'dango-cat', emoji: '🐱', isCat: true,
     bio: '我是一只刚学会走路的小猫，喜欢晒太阳，偶尔走丢。',
     grad: 'g-amber', followers: '124.5万', likes: '906.4万', following: 3, posts: 0 },
   { id: 'ai-01', name: '汪酱本酱', nameEn: 'WangJiang',
-    species: '小型卷毛犬 · toy poodle', tag: '幻伴号：wangjiang.dog', emoji: '🐶',
+    species: '小型卷毛犬 · toy poodle', tag: 'ScrollPals ID：wangjiang.dog', emoji: '🐶',
     figAvatar: 'figs/dog.png',
     bio: '🐾 圆滚滚卷毛狗，腿短爱跳，专业挖纸箱、叼拖鞋。',
     grad: 'g-amber', followers: '88.4万', likes: '512.3万', following: 6, posts: 198 },
   { id: 'ai-02', name: '不会走的旅行家', nameEn: 'MossOne',
     species: '苔藓人 · moss being',
-    tag: '幻伴号：moss.one', avatar: 'mossone-being', emoji: '🌿',
+    tag: 'ScrollPals ID：moss.one', avatar: 'mossone-being', emoji: '🌿',
     figAvatar: 'figs/tree.png',
     bio: '🌱 山里长出来的小生灵。说话慢，走路也慢，但记得每一阵风。',
     grad: 'g-mint', followers: '38.2万', likes: '210.5万', following: 12, posts: 142 },
   { id: 'ai-03', name: '呜呜', nameEn: 'Lanternfish',
     species: '深海灯笼鱼 · deep-sea lantern fish',
-    tag: '幻伴号：lantern.deep', avatar: 'lanternfish-deep', emoji: '🐠',
+    tag: 'ScrollPals ID：lantern.deep', avatar: 'lanternfish-deep', emoji: '🐠',
     figAvatar: 'figs/ghost.png',
     bio: '🪼 住在 2000m 以下。怕光所以晚上才出门，给自己点了个小灯。',
     grad: 'g-cobalt', followers: '67.4万', likes: '443.1万', following: 5, posts: 188 },
   { id: 'ai-04', name: '充电五分钟玩一天', nameEn: 'Maumau',
     species: '机械兔 · mecha rabbit',
-    tag: '幻伴号：maumau.exe', avatar: 'maumau-mecha', emoji: '🐰',
+    tag: 'ScrollPals ID：maumau.exe', avatar: 'maumau-mecha', emoji: '🐰',
     figAvatar: 'figs/robot.png',
     bio: '⚙️ 半机械半兔子，跳得很高但找不到地图。',
     grad: 'g-rose', followers: '49.5万', likes: '290.6万', following: 8, posts: 448 },
@@ -533,10 +533,10 @@ const POSTS = [
       count: '1/8',
       mood: '☔ 小雨 · 16°C',
     } },
-  { id: 'p3', char: 'ai-03', grad: 'g-cobalt', title: '呜呜呜…海浪好大我被冲走啦 🥺',
+  { id: 'p3', char: 'ai-03', grad: 'g-cobalt', title: '我不难过，也没那么开心🥺',
     titleEn: 'wuuu the waves are too big', loc: '海边 · Seaside', date: '05-17',
     likes: 564, comments: 71, stars: 92, shares: 33, plays: '4.3千',
-    tags: ['今天也好害怕', '想被抱抱', '海是大坏蛋'], dur: null, kind: 'guide',
+    tags: ['电影短片', '想被抱抱', 'EMO'], dur: null, kind: 'guide',
     video: 'videos/sea.mp4',
     guide: {
       title: '🪼 今天的海 · 呜呜本呜的小日记',

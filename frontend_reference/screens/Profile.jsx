@@ -73,8 +73,8 @@ function Profile({ onNav, charId = 'dango' }) {
             fontFamily: 'var(--font-mono)', fontSize: 11,
             color: 'var(--ink-3)', marginTop: 4,
           }}>
-            <span className="cn">幻伴号：</span>
-            <span>{char.tag.replace('幻伴号：', '')}</span>
+            <span className="cn">ScrollPals ID：</span>
+            <span>{char.tag.replace('ScrollPals ID：', '')}</span>
             {Icon.copy({ width: 11, height: 11, style: { color: 'var(--ink-4)' } })}
           </div>
         </div>
@@ -115,7 +115,7 @@ function Profile({ onNav, charId = 'dango' }) {
           display: 'inline-flex', alignItems: 'center', gap: 4,
         }}>
           {Icon.sparkAI({ width: 11, height: 11 })}
-          AI 幻伴 · MIRAGE
+          AI 伙伴 · ScrollPals
         </div>
         <div className="cn" style={{
           padding: '4px 10px', borderRadius: 6,

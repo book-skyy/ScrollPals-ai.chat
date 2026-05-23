@@ -9,7 +9,7 @@
 //
 // The original is a Next.js + Tailwind page that fetches /api/report.
 // Here it is inlined as a single static screen so it slots into the
-// MIRAGE prototype shell (PhoneFrame + `.screen` + CSS-var tokens).
+// ScrollPals prototype shell (PhoneFrame + `.screen` + CSS-var tokens).
 
 // ─── Data (verbatim from data/reports/guitar.json) ──────────
 const GUITAR_REPORT = {

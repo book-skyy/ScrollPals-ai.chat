@@ -1,4 +1,4 @@
-// app.jsx — Main router for MIRAGE 幻伴 prototype
+// app.jsx — Main router for ScrollPals prototype
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "dark",
@@ -182,8 +182,8 @@ function BrandCorner() {
         boxShadow: '0 0 16px rgba(164,139,255,0.4)',
       }} />
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-        <span style={{ fontFamily: 'var(--font-en)', fontSize: 14, fontWeight: 600, letterSpacing: 0.04, color: '#fff' }}>MIRAGE</span>
-        <span className="cn" style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>幻伴 · AI 视频流</span>
+        <span style={{ fontFamily: 'var(--font-en)', fontSize: 14, fontWeight: 600, letterSpacing: 0.04, color: '#fff' }}>ScrollPals</span>
+        <span className="cn" style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>AI 视频流</span>
       </div>
     </div>
   );
