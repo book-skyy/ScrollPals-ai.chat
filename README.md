@@ -1,0 +1,1 @@
+# ScrollPals-ai.chat
