@@ -8,14 +8,12 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 const SCREENS = [
   { id: 'character-create', label: '01 创建', en: 'Create' },
-  { id: 'character-360', label: '02 环绕', en: '360°' },
-  { id: 'feed', label: '03 首页', en: 'Feed' },
-  { id: 'profile', label: '04 主页', en: 'Profile' },
-  { id: 'footprint', label: '05 足迹', en: 'Map' },
-  { id: 'chat', label: '06 聊天', en: 'Chat' },
-  { id: 'video', label: '07 视频', en: 'Video' },
-  { id: 'collection', label: '08 收藏', en: 'Postcards' },
-  { id: 'guitar-report', label: '09 报告', en: 'Report' },
+  { id: 'feed', label: '02 首页', en: 'Feed' },
+  { id: 'profile', label: '03 主页', en: 'Profile' },
+  { id: 'footprint', label: '04 足迹', en: 'Map' },
+  { id: 'chat', label: '05 聊天', en: 'Chat' },
+  { id: 'collection', label: '06 收藏', en: 'Postcards' },
+  { id: 'guitar-report', label: '07 报告', en: 'Report' },
 ];
 
 function App() {
@@ -102,8 +100,6 @@ function Router({ screen, ctx, onNav, tweaks }) {
   switch (screen) {
     case 'character-create':
       return <CharacterCreation onNav={onNav} tweaks={tweaks} />;
-    case 'character-360':
-      return <Character360 onNav={onNav} />;
     case 'feed':
       return <Feed onNav={onNav} tweaks={tweaks} />;
     case 'profile':
@@ -112,14 +108,12 @@ function Router({ screen, ctx, onNav, tweaks }) {
       return <Footprint onNav={onNav} charId={ctx.charId} />;
     case 'chat':
       return <Chat onNav={onNav} charId={ctx.charId} />;
-    case 'video':
-      return <VideoPlayer onNav={onNav} postId={ctx.postId} />;
     case 'collection':
       return <CollectionScreen onNav={onNav} />;
     case 'guitar-report':
       return <GuitarReport onNav={onNav} />;
     default:
-      return <CharacterCreation onNav={onNav} />;
+      return <Feed onNav={onNav} tweaks={tweaks} />;
   }
 }
 

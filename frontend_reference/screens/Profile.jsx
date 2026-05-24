@@ -5,7 +5,7 @@
 //   Big primary follow button + share
 //   作品 NNN heading, 3-column grid
 
-function Profile({ onNav, charId = 'ai-01' }) {
+function Profile({ onNav, charId = 'dango' }) {
   const char = CHARACTERS.find((c) => c.id === charId) || CHARACTERS[0];
   const charPosts = POSTS.filter((p) => p.char === charId);
   const grid = [...charPosts, ...POSTS, ...POSTS].slice(0, 12);
@@ -14,22 +14,19 @@ function Profile({ onNav, charId = 'ai-01' }) {
   return (
     <div className="screen" data-screen-label="04 Profile">
       {/* Hero banner */}
-      <div className={`ai-video ${char.grad}`} style={{
+      <div style={{
         position: 'relative',
         height: 340,
         marginBottom: -90,
         overflow: 'hidden',
+        background: '#1a1230',
       }}>
-        {char.isCat && (
-          <div style={{
-            position: 'absolute', inset: 0, zIndex: 2,
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            pointerEvents: 'none',
-          }}>
-            <CatSprite view="three" height={300}
-              style={{ marginBottom: -10, opacity: 0.92 }} />
-          </div>
-        )}
+        <img src="figs/background.png" alt=""
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%', objectFit: 'cover',
+            zIndex: 1, display: 'block',
+          }} />
         <div style={{
           position: 'absolute', inset: 0, zIndex: 4,
           background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 40%, var(--bg) 95%)',
@@ -45,26 +42,6 @@ function Profile({ onNav, charId = 'ai-01' }) {
             <CircleBtn dark>{Icon.search({ width: 18, height: 18 })}</CircleBtn>
             <CircleBtn dark>{Icon.more()}</CircleBtn>
           </div>
-        </div>
-        {/* Character name overlay on hero */}
-        <div style={{
-          position: 'absolute', top: 110, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 6, textAlign: 'center',
-          textShadow: '0 2px 16px rgba(0,0,0,0.5)',
-        }}>
-          <div className="display-cn" style={{
-            fontSize: 30, fontWeight: 700, color: '#fff',
-            letterSpacing: '0.06em',
-            display: 'flex', alignItems: 'center', gap: 8,
-            justifyContent: 'center',
-          }}>
-            <span>{char.emoji}</span>{char.name}<span>{char.emoji}</span>
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10.5,
-            color: 'rgba(255,255,255,0.9)', marginTop: 4,
-            letterSpacing: 0.18, textTransform: 'uppercase',
-          }}>{char.species}</div>
         </div>
       </div>
 
@@ -237,11 +214,10 @@ function Profile({ onNav, charId = 'ai-01' }) {
       }}>
         {grid.map((p, i) => (
           <GridCell key={`${p.id}-${i}`} post={p} idx={i}
-            onTap={() => onNav('video', { postId: p.id })} />
+            onTap={() => {}} />
         ))}
       </div>
 
-      <TabBar active="profile" onNav={onNav} theme="dark" />
     </div>
   );
 }

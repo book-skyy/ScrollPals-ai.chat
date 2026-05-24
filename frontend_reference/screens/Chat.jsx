@@ -8,17 +8,17 @@ const BUBBLE_AI = '#ffffff';
 const BUBBLE_ME = '#a48bff';  // MIRAGE purple instead of WeChat green
 
 const SAMPLE_MESSAGES = [
-  { from: 'ai', kind: 'sticker', sticker: 'shrug', time: '2025/05/22 21:58' },
-  { from: 'me', text: '你今天去哪了？', time: null },
-  { from: 'ai', kind: 'image', post: 'p1', time: null },
-  { from: 'ai', text: '京都，下了一场雨。\n我躲在屋檐下听了 12 分钟。', time: null },
-  { from: 'me', text: '稀客呀', time: '2025/05/22 22:15' },
-  { from: 'ai', text: '哈哈，你也是。', time: null },
-  { from: 'me', text: '都 4000 粉了', time: '2025/05/22 22:40' },
-  { from: 'me', text: '加油哦', time: null, read: true },
+  { from: 'me', text: '你今天去哪了？', time: '2025/05/22 21:58' },
+  { from: 'ai', text: '主人主人！我今天发现了一个超大的纸箱子喵～ 🥺\n钻进去就再也不想出来了 (´･ω･`)', time: null },
+  { from: 'me', text: '那你出来了吗哈哈', time: '2025/05/22 22:15' },
+  { from: 'ai', text: '出来啦！因为听到主人喂罐头的声音 (灬º‿º灬)♡', time: null },
+  { from: 'ai', text: '主人今天有想我嘛 >ω<', time: null },
+  { from: 'me', text: '想啦想啦', time: '2025/05/22 22:40' },
+  { from: 'me', text: '今天也乖乖的呀', time: null, read: true },
+  { from: 'ai', text: '喵呜～有主人在我什么都不怕！(๑•̀ㅂ•́)و✧', time: null },
 ];
 
-function Chat({ onNav, charId = 'ai-01' }) {
+function Chat({ onNav, charId = 'dango' }) {
   const char = CHARACTERS.find((c) => c.id === charId) || CHARACTERS[0];
   const [input, setInput] = React.useState('');
   const messagesEnd = React.useRef(null);
@@ -51,14 +51,16 @@ function Chat({ onNav, charId = 'ai-01' }) {
         position: 'relative', zIndex: 10,
         display: 'flex', alignItems: 'center', gap: 8,
       }}>
-        <button onClick={() => onNav('profile', { charId })}
+        <button onClick={() => onNav('feed')}
           style={{
             width: 32, height: 32, background: 'transparent', border: 0,
             color: CHAT_INK, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 0,
           }}>{Icon.back()}</button>
-        <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />
+        <div onClick={() => onNav('profile', { charId })} style={{ cursor: 'pointer' }}>
+          <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />
+        </div>
         <div className="cn" style={{ flex: 1, fontSize: 17, fontWeight: 600 }}>
           {char.name}
         </div>
@@ -231,12 +233,16 @@ function Bubble({ m, char, onNav }) {
   // Image / shared post bubble
   if (m.kind === 'image' && post) {
     return (
-      <Row isMe={isMe} avatar={isMe ? null : <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />}>
-        <div onClick={() => onNav('video', { postId: post.id })}
+      <Row isMe={isMe} avatar={isMe ? null : (
+        <div onClick={() => onNav('profile', { charId: char.id })} style={{ cursor: 'pointer' }}>
+          <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />
+        </div>
+      )}>
+        <div
           className={`ai-video ${post.grad}`}
           style={{
             width: 180, height: 240, borderRadius: 8,
-            cursor: 'pointer', position: 'relative',
+            position: 'relative',
             border: '1px solid rgba(0,0,0,0.05)',
           }}>
           <div className="cn" style={{
@@ -252,7 +258,11 @@ function Bubble({ m, char, onNav }) {
   // Sticker bubble — large transparent emoji block (like the panda in reference)
   if (m.kind === 'sticker') {
     return (
-      <Row isMe={isMe} avatar={isMe ? null : <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />}>
+      <Row isMe={isMe} avatar={isMe ? null : (
+        <div onClick={() => onNav('profile', { charId: char.id })} style={{ cursor: 'pointer' }}>
+          <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />
+        </div>
+      )}>
         <div style={{
           width: 140, height: 140,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -268,7 +278,11 @@ function Bubble({ m, char, onNav }) {
 
   // Text bubble
   return (
-    <Row isMe={isMe} avatar={isMe ? null : <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />}>
+    <Row isMe={isMe} avatar={isMe ? null : (
+        <div onClick={() => onNav('profile', { charId: char.id })} style={{ cursor: 'pointer' }}>
+          <SmallAvatar char={char} emoji={char.emoji} grad={char.grad} size={36} />
+        </div>
+      )}>
       <div className="cn" style={{
         maxWidth: 240,
         padding: '9px 13px',
@@ -310,16 +324,21 @@ function Row({ isMe, avatar, children }) {
   return (
     <div style={{
       display: 'flex',
-      flexDirection: isMe ? 'row-reverse' : 'row',
+      flexDirection: 'row',
       alignItems: 'flex-start',
       gap: 8,
       width: '100%',
     }}>
+      {/* Partner avatar — pinned to the left edge */}
       {!isMe && avatar}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
+      <div style={{
+        flex: 1, minWidth: 0,
+        display: 'flex', flexDirection: 'column',
+        alignItems: isMe ? 'flex-end' : 'flex-start',
+      }}>
         {children}
       </div>
-      {/* "me" avatar — small placeholder on the right */}
+      {/* "me" avatar — pinned to the right edge */}
       {isMe && (
         <div style={{
           width: 36, height: 36, borderRadius: 6,

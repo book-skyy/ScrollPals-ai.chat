@@ -18,6 +18,8 @@ const VISITED = [
   { id: 'marrakech',  cn: '马拉喀什',   en: 'Marrakech',  date: 'Apr 29', posts: 11, lat: 31.6295, lng:  -7.9811,  q: 'Marrakech, Morocco' },
   { id: 'capetown',   cn: '开普敦',     en: 'Cape Town',  date: 'Apr 22', posts:  6, lat: -33.9249, lng: 18.4241,  q: 'Cape Town, South Africa' },
   { id: 'tasmania',   cn: '塔斯马尼亚', en: 'Tasmania',   date: 'Apr 06', posts:  5, lat: -42.0409, lng: 146.8087, q: 'Tasmania, Australia' },
+  { id: 'egypt',      cn: '埃及',       en: 'Egypt',      date: 'Mar 28', posts: 13, lat: 30.0444, lng:  31.2357,  q: 'Cairo, Egypt' },
+  { id: 'anhui',      cn: '安徽',       en: 'Anhui',      date: 'May 23', posts:  6, lat: 31.8206, lng: 117.2272,  q: 'Hefei, Anhui, China' },
 ];
 
 const CITY_COLOR = '#c7b6ff';
@@ -60,7 +62,7 @@ const DOT_STYLE_SELECTED = {
   fillColor: CITY_COLOR, fillOpacity: 0.7,
 };
 
-const BOUNDARY_CACHE_KEY = 'fp.boundary.v1';
+const BOUNDARY_CACHE_KEY = 'fp.boundary.v2';
 
 function loadBoundaryCache() {
   try { return JSON.parse(localStorage.getItem(BOUNDARY_CACHE_KEY) || '{}'); }
@@ -68,6 +70,29 @@ function loadBoundaryCache() {
 }
 function saveBoundaryCache(cache) {
   try { localStorage.setItem(BOUNDARY_CACHE_KEY, JSON.stringify(cache)); } catch {}
+}
+
+// 粗略多边形面积(shoelace,经纬度直接算,不需要等积投影 — 我们只用来比较大小)。
+function ringArea(ring) {
+  let a = 0;
+  for (let i = 0, n = ring.length; i < n - 1; i++) {
+    a += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+  }
+  return Math.abs(a) / 2;
+}
+
+// MultiPolygon 常常包含很多很小的离岸岛屿碎片(比如上海的崇明/横沙等离岛或港口飞地),
+// 在低 zoom 下看起来像"周围有很碎的小城市"。这里只保留面积 >= 最大块 5% 的部分。
+function simplifyGeometry(geom) {
+  if (!geom || geom.type !== 'MultiPolygon') return geom;
+  const polys = geom.coordinates; // [ [ outerRing, ...holes ], ... ]
+  if (polys.length <= 1) return geom;
+  const areas = polys.map((p) => ringArea(p[0]));
+  const maxA = Math.max.apply(null, areas);
+  const threshold = maxA * 0.05;
+  const kept = polys.filter((_, i) => areas[i] >= threshold);
+  if (kept.length === polys.length) return geom;
+  return { type: 'MultiPolygon', coordinates: kept };
 }
 
 // Nominatim 返回的 polygon_geojson 是 GeoJSON Geometry,不是 Feature。
@@ -84,10 +109,10 @@ async function fetchBoundary(city) {
   // 只接受面/多面;点状(geojson.type === 'Point')视为无边界
   const t = hit.geojson.type;
   if (t !== 'Polygon' && t !== 'MultiPolygon') return null;
-  return hit.geojson;
+  return simplifyGeometry(hit.geojson);
 }
 
-function Footprint({ onNav, charId = 'ai-01' }) {
+function Footprint({ onNav, charId = 'dango' }) {
   const char = CHARACTERS.find((c) => c.id === charId) || CHARACTERS[0];
   const [selected, setSelected] = React.useState('kyoto');
   const sel = VISITED.find((c) => c.id === selected);
@@ -353,11 +378,11 @@ function Footprint({ onNav, charId = 'ai-01' }) {
         <div className="section-label" style={{ marginBottom: 10 }}>posts from here</div>
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 18, scrollbarWidth: 'none' }}>
           {POSTS.slice(0, 4).map((p) => (
-            <div key={p.id} onClick={() => onNav('video', { postId: p.id })}
+            <div key={p.id}
               className={`ai-video ${p.grad}`}
               style={{
                 width: 110, height: 150, borderRadius: 12,
-                flexShrink: 0, position: 'relative', cursor: 'pointer',
+                flexShrink: 0, position: 'relative',
                 border: '1px solid var(--line)',
               }}>
               <div className="cn" style={{

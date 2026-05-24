@@ -146,7 +146,7 @@ function CollectionScreen({ onNav }) {
                 }}>
                   {g.items.map((it, idx) => (
                     <MiniPostcard key={it.postId} item={it} tilt={idx % 2 === 0 ? -2 : 2}
-                      onTap={() => onNav('video', { postId: it.postId })}
+                      onTap={() => {}}
                       onRemove={() => Collection.remove(it.postId)} />
                   ))}
                 </div>

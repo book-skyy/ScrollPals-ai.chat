@@ -491,13 +491,15 @@ function GuitarReport({ onNav }) {
   const color = report.neon_color;
 
   return (
-    <div className="screen" data-screen-label="09 Report">
-      {/* Top bar */}
+    <div className="screen report-snap" data-screen-label="09 Report"
+      style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}>
+      {/* Top bar (overlay across all snap pages) */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 10,
         padding: '54px 14px 10px',
         background: 'linear-gradient(180deg, var(--bg) 60%, transparent)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: -64,  // pull the first page up so it tucks under the topbar
       }}>
         <button onClick={() => onNav && onNav('feed')} style={{
           background: 'transparent', border: 0, color: 'var(--ink-2)',
@@ -509,71 +511,45 @@ function GuitarReport({ onNav }) {
         <div className="mono" style={{ fontSize: 10, color: 'var(--ink-3)', letterSpacing: 0.5 }}>REPORT · {report.hobby_id}</div>
       </div>
 
-      {/* Hero header with neon band */}
-      <div style={{
-        margin: '4px 14px 16px',
-        padding: '18px 16px 20px',
-        borderRadius: 18,
-        border: `1px solid ${color}55`,
-        background: `linear-gradient(135deg, ${color}28, transparent 65%)`,
-        boxShadow: `0 0 28px ${color}25 inset`,
-      }}>
-        <div className="mono" style={{
-          fontSize: 10, letterSpacing: 2, textTransform: 'uppercase',
-          color, marginBottom: 6,
-        }}>{report.category_label}</div>
-        <h1 className="display-cn" style={{ margin: 0, fontSize: 32, color: 'var(--ink)', letterSpacing: '0.05em' }}>
-          {report.hobby_name}
-        </h1>
-        <div className="cn" style={{ marginTop: 6, color: 'var(--ink-3)', fontSize: 11.5 }}>
-          {report.sections.length} 个模块 · 基于 {Object.keys(report.evidence).length} 篇小红书 + {Object.keys(report.videos).length} 个抖音视频整理
-        </div>
-      </div>
-
-      {/* Sections */}
-      <div style={{ padding: '0 14px 110px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {report.sections.map((section, i) => (
-          <section key={section.id} style={{
-            padding: 14, borderRadius: 16,
+      {/* Sections — each one snap-scrolls as its own page */}
+      {report.sections.map((section, i) => (
+        <ReportPage key={section.id}>
+          <section style={{
+            padding: 16, borderRadius: 16,
             background: 'var(--bg-elev)',
             border: '1px solid var(--line)',
           }}>
-            <header style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <header style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <span className="mono" style={{
                 width: 22, height: 22, borderRadius: 6, flexShrink: 0,
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 background: `${color}22`, color, fontSize: 11, fontWeight: 700,
               }}>{String(i + 1).padStart(2, '0')}</span>
-              <h2 className="cn" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--ink)' }}>{section.title}</h2>
+              <h2 className="cn" style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--ink)' }}>{section.title}</h2>
             </header>
             <ContentByType content={section.content} color={color} />
             <SectionRefs section={section} report={report} color={color} />
           </section>
-        ))}
-      </div>
+        </ReportPage>
+      ))}
 
-      {/* "再来一个" — random re-roll, mock-only here */}
-      <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 18,
-        display: 'flex', justifyContent: 'center', pointerEvents: 'none',
-      }}>
-        <button
-          onClick={() => onNav && onNav('feed')}
-          className="cn"
-          style={{
-            pointerEvents: 'auto',
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '12px 22px', borderRadius: 999,
-            border: 0,
-            background: color, color: '#0a0a0c',
-            fontSize: 14, fontWeight: 700, letterSpacing: 0.5,
-            boxShadow: `0 0 22px ${color}88`,
-            cursor: 'pointer',
-          }}
-        >
-          🎲 再来一个
-        </button>
-      </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .report-snap > .report-page { scroll-snap-align: start; scroll-snap-stop: always; }
+        .report-snap .report-page section::-webkit-scrollbar { display: none; }
+      `}} />
+    </div>
+  );
+}
+
+function ReportPage({ children }) {
+  return (
+    <div className="report-page" style={{
+      minHeight: '100%',
+      padding: '74px 14px 24px',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      boxSizing: 'border-box',
+    }}>
+      {children}
     </div>
   );
 }
