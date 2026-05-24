@@ -202,6 +202,8 @@ const Collection = {
       grad: post.grad,
       kind: post.kind,
       caption: post.photo?.caption || post.guide?.intro || '',
+      cardFront: post.cardFront,
+      cardBack: post.cardBack,
       collectedAt: new Date().toISOString(),
     };
     const next = [entry, ...items];

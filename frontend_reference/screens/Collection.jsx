@@ -17,6 +17,9 @@ function CollectionScreen({ onNav }) {
   }, [items]);
 
   const [active, setActive] = React.useState(null);
+  const [viewing, setViewing] = React.useState(null); // postcard item being viewed full-screen
+  const [viewFlipped, setViewFlipped] = React.useState(false);
+  React.useEffect(() => { setViewFlipped(false); }, [viewing]);
 
   return (
     <div className="screen" data-screen-label="08 Collection" style={{ background: 'var(--bg)' }}>
@@ -146,7 +149,7 @@ function CollectionScreen({ onNav }) {
                 }}>
                   {g.items.map((it, idx) => (
                     <MiniPostcard key={it.postId} item={it} tilt={idx % 2 === 0 ? -2 : 2}
-                      onTap={() => {}}
+                      onTap={() => setViewing(it)}
                       onRemove={() => Collection.remove(it.postId)} />
                   ))}
                 </div>
@@ -156,92 +159,131 @@ function CollectionScreen({ onNav }) {
       )}
 
       <TabBar active="profile" onNav={onNav} theme="light" />
+
+      {viewing && (
+        <PostcardLightbox item={viewing}
+          flipped={viewFlipped}
+          onFlip={() => setViewFlipped((f) => !f)}
+          onClose={() => setViewing(null)} />
+      )}
     </div>
   );
 }
 
 function MiniPostcard({ item, tilt = 0, onTap, onRemove }) {
-  const char = CHARACTERS.find((c) => c.id === item.charId);
-  const cityEn = (item.loc || '').split(' · ')[1] || '';
+  // Fall back to live POSTS entry so older cached items (saved before cardBack
+  // was persisted) still render the right image.
+  const livePost = POSTS.find((p) => p.id === item.postId) || {};
+  const img = item.cardBack || livePost.cardBack || item.cardFront || livePost.cardFront;
   return (
-    <div className="postcard"
-      onClick={onTap}
+    <div onClick={onTap}
       style={{
         position: 'relative',
         aspectRatio: '5/7',
-        borderRadius: 12,
+        borderRadius: 10,
         overflow: 'hidden',
         cursor: 'pointer',
         transform: `rotate(${tilt}deg)`,
         transition: 'transform 0.25s, box-shadow 0.25s',
         boxShadow: '0 10px 24px rgba(0,0,0,0.35)',
+        background: '#1a1820',
       }}>
-      <div className={`postcard-stamp ${item.grad}`} style={{
-        position: 'absolute', top: 8, right: 8,
-        width: 36, height: 46, padding: 4, fontSize: 18,
-        borderRadius: 3,
-        boxShadow: '0 0 0 2.5px #fff, 0 0 0 3px rgba(40,28,12,0.18)',
-      }}>
-        <span style={{ position: 'relative', zIndex: 2 }}>{char?.emoji}</span>
-      </div>
-
-      <div className="postcard-postmark" style={{
-        top: 10, left: 8, width: 54, height: 54,
-        fontSize: 7,
-      }}>
-        <span>{(cityEn || item.loc.split(' · ')[0]).toUpperCase()}</span>
-        <span style={{ marginTop: 1, fontSize: 9 }}>{item.date}</span>
-      </div>
-
-      <div style={{
-        position: 'absolute', left: 10, right: 10, top: 78, bottom: 36,
-        display: 'flex', flexDirection: 'column', gap: 4,
-      }}>
-        <div className="cn display-cn" style={{
-          fontFamily: 'var(--font-display-cn)',
-          fontSize: 13, fontWeight: 600, lineHeight: 1.25,
-          color: '#2a2018',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}>{item.title}</div>
-        <p className="cn" style={{
-          margin: 0,
-          fontSize: 10, lineHeight: 1.45,
-          color: 'rgba(42, 32, 24, 0.7)',
-          display: '-webkit-box',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}>{item.caption}</p>
-      </div>
-
-      <div style={{
-        position: 'absolute', left: 10, right: 10, bottom: 8,
-        display: 'flex', alignItems: 'center', gap: 6,
-      }}>
-        <span className="cn" style={{
-          fontFamily: 'var(--font-display-cn)', fontStyle: 'italic',
-          fontSize: 11, color: 'rgba(42, 32, 24, 0.7)',
-          flex: 1,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>— {char?.name || '旅人'}</span>
-        <button onClick={(e) => { e.stopPropagation(); onRemove(); }}
-          aria-label="移除"
+      {img ? (
+        <img src={img} alt=""
           style={{
-            width: 22, height: 22, borderRadius: '50%',
-            background: 'rgba(40, 28, 12, 0.08)',
-            border: '0.5px solid rgba(40, 28, 12, 0.18)',
-            color: 'rgba(40, 28, 12, 0.6)',
-            cursor: 'pointer', padding: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
-        </button>
+            width: '100%', height: '100%', objectFit: 'cover',
+            display: 'block',
+          }} />
+      ) : (
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'rgba(255,255,255,0.4)', fontSize: 12,
+        }}>没有图片</div>
+      )}
+
+      <button onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        aria-label="移除"
+        style={{
+          position: 'absolute', top: 6, right: 6,
+          width: 22, height: 22, borderRadius: '50%',
+          background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)',
+          border: '0.5px solid rgba(255,255,255,0.2)',
+          color: '#fff',
+          cursor: 'pointer', padding: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2,
+        }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+// Full-screen postcard viewer triggered by tapping a card in the collection.
+function PostcardLightbox({ item, flipped, onFlip, onClose }) {
+  const livePost = POSTS.find((p) => p.id === item.postId) || {};
+  const front = item.cardFront || livePost.cardFront;
+  const back  = item.cardBack  || livePost.cardBack;
+  const img = flipped ? back : front;
+  return (
+    <div onClick={onClose}
+      style={{
+        position: 'absolute', inset: 0, zIndex: 200,
+        background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)',
+        display: 'flex', flexDirection: 'column',
+      }}>
+      {/* Close */}
+      <button onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="close"
+        style={{
+          position: 'absolute', top: 58, right: 18, zIndex: 5,
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.12)', border: '0.5px solid rgba(255,255,255,0.18)',
+          color: '#fff', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+      </button>
+
+      <div style={{
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '70px 16px 110px',
+      }} onClick={(e) => e.stopPropagation()}>
+        {img ? (
+          <img src={img} alt=""
+            style={{
+              maxWidth: '100%', maxHeight: '100%', display: 'block',
+              borderRadius: 12,
+              boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+            }} />
+        ) : (
+          <div className="cn" style={{ color: 'rgba(255,255,255,0.6)' }}>没有图片</div>
+        )}
       </div>
+
+      {/* Flip toggle */}
+      {back && (
+        <button onClick={(e) => { e.stopPropagation(); onFlip(); }}
+          className="cn"
+          style={{
+            position: 'absolute', left: '50%', bottom: 36,
+            transform: 'translateX(-50%)',
+            padding: '10px 20px', borderRadius: 999,
+            background: 'rgba(255,255,255,0.14)',
+            border: '0.5px solid rgba(255,255,255,0.22)',
+            color: '#fff', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+          }}>
+          {Icon.flip()}
+          {flipped ? '看正面' : '看背面'}
+        </button>
+      )}
     </div>
   );
 }
